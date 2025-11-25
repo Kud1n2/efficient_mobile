@@ -1,0 +1,253 @@
+basePath: /
+definitions:
+  main.ErrorResponse:
+    description: Standard error response format
+    properties:
+      error:
+        example: Database error
+        type: string
+      message:
+        example: Could not connect to database
+        type: string
+    type: object
+  main.FindByName:
+    description: Request to find subscription by service name
+    properties:
+      service_name:
+        type: string
+    type: object
+  main.GetSum:
+    description: Request to calculate total subscription costs with filters
+    properties:
+      finish_date:
+        type: string
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  main.SuccessResponse:
+    description: Standard success response format
+    properties:
+      message:
+        example: Operation completed successfully
+        type: string
+    type: object
+  main.SumResponse:
+    description: Response format for sum calculation
+    properties:
+      sum:
+        example: 4500
+        type: integer
+    type: object
+  main.UpdateByName:
+    description: Request to update subscription information
+    properties:
+      finish_date:
+        type: string
+      old_service_name:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  main.WithDate:
+    description: Subscription information with start and end dates
+    properties:
+      finish_date:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@effectivemobile.com
+    name: API Support
+  description: Comprehensive REST API for managing subscriptions with CRUD operations
+    and cost calculations
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: http://swagger.io/terms/
+  title: Effective Mobile Subscriptions API
+  version: "1.0"
+paths:
+  /effective_mobile:
+    get:
+      description: Retrieve all subscriptions from database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.WithDate'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Get all subscriptions
+      tags:
+      - Subscriptions
+    post:
+      consumes:
+      - application/json
+      description: Add a new subscription to database
+      parameters:
+      - description: Subscription data
+        in: body
+        name: subscription
+        required: true
+        schema:
+          $ref: '#/definitions/main.WithDate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Create new subscription
+      tags:
+      - Subscriptions
+  /effective_mobile/{service_name}:
+    get:
+      description: Retrieve subscription by service name using path parameter
+      parameters:
+      - description: Service Name
+        in: path
+        name: service_name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.WithDate'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Get subscription by service name
+      tags:
+      - Subscriptions
+  /effective_mobile/id:
+    delete:
+      consumes:
+      - application/json
+      description: Remove subscription from database by service name
+      parameters:
+      - description: Service name to delete
+        in: body
+        name: service_name
+        required: true
+        schema:
+          $ref: '#/definitions/main.FindByName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Delete subscription by service name
+      tags:
+      - Subscriptions
+    put:
+      consumes:
+      - application/json
+      description: Update existing subscription information
+      parameters:
+      - description: Updated subscription data
+        in: body
+        name: subscription
+        required: true
+        schema:
+          $ref: '#/definitions/main.UpdateByName'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Update subscription
+      tags:
+      - Subscriptions
+  /getSum:
+    get:
+      consumes:
+      - application/json
+      description: Calculate sum of subscription prices with optional filters
+      parameters:
+      - description: Filter criteria
+        in: body
+        name: filters
+        required: true
+        schema:
+          $ref: '#/definitions/main.GetSum'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.SumResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/main.ErrorResponse'
+      summary: Calculate total subscription costs
+      tags:
+      - Analytics
+schemes:
+- http
+swagger: "2.0"
